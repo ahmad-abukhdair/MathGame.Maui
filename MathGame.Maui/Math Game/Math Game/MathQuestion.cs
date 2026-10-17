@@ -26,9 +26,7 @@ namespace Math_Game
             {
                 if (Firstnumber < 0 || Firstnumber > 100)
                 {
-                    throw new ArgumentOutOfRangeException(
-                        nameof(Firstnumber),
-                        "The dividend must be between 0 and 100.");
+                    throw new ArgumentOutOfRangeException(nameof(Firstnumber),"The dividend must be between 0 and 100.");
                 }
 
                 if (Secondnumber == 0)

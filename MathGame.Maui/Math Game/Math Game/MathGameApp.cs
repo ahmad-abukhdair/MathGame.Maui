@@ -8,64 +8,101 @@ namespace Math_Game
     public class MathGameApp
     {
         private readonly Random _random = new Random();
-
+        private readonly List<GameResult> _gameHistory = new();
+        const int questionCount = 5;
         public void Run()
         {
-            const int questionCount = 5;
+            
 
             while (true)
             {
                 DisplayMenu();
 
-                int choice = ReadNumber("Choose an option: ");
-
-                if (choice == 0)
+                if (!RuntheGame())
                 {
                     return;
                 }
 
-                if (choice < 1 || choice > 4)
-                {
-                    Console.WriteLine("Please choose a number from 0 to 4.");
-                    continue;
-                }
 
-                MathOperation operation = choice switch
-                {
-                    1 => MathOperation.Addition,
-                    2 => MathOperation.Subtraction,
-                    3 => MathOperation.Multiplication,
-                    4 => MathOperation.Division,
-                    _ => throw new ArgumentOutOfRangeException(nameof(choice))
-                };
 
-                int score = 0;
 
-                for (int questionNumber = 1;
-                     questionNumber <= questionCount;
-                     questionNumber++)
-                {
-                    MathQuestion question = GenerateQuestion(operation);
 
-                    Console.WriteLine($"\nQuestion {questionNumber}/{questionCount}");
-                    Console.WriteLine(question.GetQuestionText());
-
-                    int answer = ReadNumber("Your answer: ");
-
-                    if (question.IsCorrect(answer))
-                    {
-                        score++;
-                        Console.WriteLine("Correct!");
-                    }
-                    else
-                    {
-                        Console.WriteLine("Incorrect.");
-                    }
-                }
-
-                Console.WriteLine($"\nYour score: {score}/{questionCount}\n");
             }
         }
+        private bool RuntheGame()
+        {
+            int choice = ReadNumber("Choose an option: ");
+            if (choice == 0)
+            {
+                return false;
+            }
+
+            if (choice < 1 || choice > 5)
+            {
+                Console.WriteLine("Please choose a number from 0 to 4.");
+
+                return true;
+            }
+            if (choice == 5) { DisplayGameHistory(); return true; }
+
+            MathOperation operation = choice switch
+            {
+                1 => MathOperation.Addition,
+                2 => MathOperation.Subtraction,
+                3 => MathOperation.Multiplication,
+                4 => MathOperation.Division,
+                _ => throw new ArgumentOutOfRangeException(nameof(choice))
+            };
+            int score = 0;
+
+            for (int questionNumber = 1; questionNumber <= questionCount; questionNumber++)
+            {
+                MathQuestion question = GenerateQuestion(operation);
+
+                Console.WriteLine($"\nQuestion {questionNumber}/{questionCount}");
+                Console.WriteLine(question.GetQuestionText());
+
+                int answer = ReadNumber("Your answer: ");
+
+                if (question.IsCorrect(answer))
+                {
+                    score++;
+                    Console.WriteLine("Correct!");
+                }
+                else
+                {
+                    Console.WriteLine("Incorrect.");
+                }
+            }
+
+            Console.WriteLine($"\nYour score: {score}/{questionCount}\n");
+
+            GameResult result = new GameResult(operation, score, questionCount); _gameHistory.Add(result);
+            return true;
+        }
+      
+            private void DisplayGameHistory()
+            {
+                Console.WriteLine("\n===== Game History =====");
+
+                if (_gameHistory.Count == 0)
+                {
+                    Console.WriteLine("No games played yet.");
+                    return;
+                }
+
+                for (int i = 0; i < _gameHistory.Count; i++)
+                {
+                    GameResult result = _gameHistory[i];
+
+                    Console.WriteLine(
+                        $"{i + 1}. Operation: {result.Operation} | " +
+                        $"Score: {result.Score}/{result.TotalQuestions}");
+                }
+
+                Console.WriteLine();
+            }
+
 
         private void DisplayMenu()
         {
@@ -74,6 +111,7 @@ namespace Math_Game
             Console.WriteLine("2. Subtraction");
             Console.WriteLine("3. Multiplication");
             Console.WriteLine("4. Division");
+            Console.WriteLine("5. View Game History");
             Console.WriteLine("0. Exit");
         }
 
